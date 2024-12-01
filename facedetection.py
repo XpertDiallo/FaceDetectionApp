@@ -3,7 +3,7 @@ import streamlit as st
 import numpy as np
 
 # Charger le fichier Haar Cascade
-HAAR_CASCADE_PATH = "haarcascade_frontalface_default.xml"
+HAAR_CASCADE_PATH = "./haarcascade_frontalface_default.xml"
 try:
     face_cascade = cv2.CascadeClassifier(HAAR_CASCADE_PATH)
     if face_cascade.empty():
