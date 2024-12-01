@@ -4,21 +4,26 @@ import numpy as np
 
 # Charger le fichier Haar Cascade
 HAAR_CASCADE_PATH = "./haarcascade_frontalface_default.xml"
-face_cascade = cv2.CascadeClassifier(HAAR_CASCADE_PATH)
+try:
+    face_cascade = cv2.CascadeClassifier(HAAR_CASCADE_PATH)
+    if face_cascade.empty():
+        raise IOError("Le fichier Haar Cascade n'a pas été chargé correctement.")
+except Exception as e:
+    st.error(f"Erreur lors du chargement du fichier Haar Cascade : {e}")
 
-def video_streaming(scaleFactor, minNeighbors, rectangle_color, video_source=0):
+def video_streaming(scaleFactor, minNeighbors, rectangle_color, video_source="./test_video.mp4"):
     """
-    Fonction pour capturer un flux vidéo (ou une vidéo préenregistrée), détecter des visages,
+    Fonction pour capturer un flux vidéo, détecter des visages,
     et capturer automatiquement 3 images.
     """
-    cap = cv2.VideoCapture(video_source)  # Utiliser 0 pour la webcam, ou le chemin d'une vidéo
+    cap = cv2.VideoCapture(video_source)  # Source vidéo
     if not cap.isOpened():
         st.error("Erreur : Impossible d'accéder à la source vidéo.")
         return
 
-    stframe = st.empty()  # Placeholder Streamlit pour afficher le flux vidéo
-    captured_images = []
-    max_photos = 3
+    stframe = st.empty()  # Placeholder pour le flux vidéo
+    captured_images = []  # Liste pour stocker les images capturées
+    max_photos = 3  # Nombre maximum de photos à capturer
 
     while len(captured_images) < max_photos:
         ret, frame = cap.read()
@@ -59,11 +64,10 @@ def app():
     rectangle_color = st.color_picker("Couleur des rectangles", "#00FF00")
     minNeighbors = st.slider("minNeighbors", min_value=1, max_value=10, value=5, step=1)
     scaleFactor = st.slider("scaleFactor", min_value=1.1, max_value=2.0, value=1.3, step=0.1)
-    video_source = st.selectbox("Source vidéo", ["Webcam", "Vidéo test"])
+    video_source = st.text_input("Chemin de la vidéo (par défaut : vidéo de test)", "./test_video.mp4")
 
     if st.button("Lancer le flux vidéo"):
-        source = 0 if video_source == "Webcam" else "./test_video.mp4"
-        video_streaming(scaleFactor, minNeighbors, rectangle_color, video_source=source)
+        video_streaming(scaleFactor, minNeighbors, rectangle_color, video_source=video_source)
 
 if __name__ == "__main__":
     app()
