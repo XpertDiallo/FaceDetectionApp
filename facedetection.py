@@ -3,9 +3,14 @@ import streamlit as st
 import numpy as np
 
 # Charger le classificateur Haar Cascade
-face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+# Assurez-vous que le fichier XML est placé dans le même répertoire que ce script
+HAAR_CASCADE_PATH = "./haarcascade_frontalface_default.xml"
+face_cascade = cv2.CascadeClassifier(HAAR_CASCADE_PATH)
 
 def video_streaming(scaleFactor, minNeighbors, rectangle_color):
+    """
+    Fonction pour capturer un flux vidéo, détecter des visages et capturer automatiquement 3 images.
+    """
     # Initialiser la webcam
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
@@ -14,7 +19,6 @@ def video_streaming(scaleFactor, minNeighbors, rectangle_color):
 
     # Initialisation des variables
     stframe = st.empty()  # Placeholder Streamlit pour afficher le flux vidéo
-    stop_button = st.button("Arrêter le flux")
     captured_images = []  # Liste pour stocker les images capturées
     max_photos = 3  # Nombre maximum de photos à capturer
 
@@ -46,11 +50,6 @@ def video_streaming(scaleFactor, minNeighbors, rectangle_color):
         # Afficher le flux vidéo dans Streamlit
         stframe.image(frame_rgb, channels="RGB")
 
-        # Sortir si l'utilisateur clique sur "Arrêter le flux"
-        if stop_button:
-            st.write("Arrêt du flux vidéo.")
-            break
-
     # Libérer les ressources
     cap.release()
 
@@ -61,14 +60,14 @@ def video_streaming(scaleFactor, minNeighbors, rectangle_color):
             img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             st.image(img_rgb, caption=f"Photo {idx + 1}", channels="RGB")
 
-# Interface Streamlit
+# Interface principale de l'application Streamlit
 def app():
-    st.title("Détection de visages et capture automatique")
+    st.title("Détection de visages avec capture automatique")
     st.markdown("""
     ### Instructions :
-    1. Cliquez sur **"Lancer le flux vidéo"** pour afficher la vidéo en temps réel.
-    2. Les visages détectés seront entourés de rectangles, et 3 photos seront automatiquement capturées.
-    3. Cliquez sur **"Arrêter le flux"** pour quitter.
+    1. Cliquez sur **"Lancer le flux vidéo"** pour démarrer la détection des visages.
+    2. Les visages détectés seront entourés de rectangles et **3 photos** seront automatiquement capturées.
+    3. Une fois 3 photos capturées, le flux vidéo s'arrête automatiquement.
     """)
 
     # Paramètres de détection
